@@ -21,12 +21,14 @@ class Main:
 
     def __mri(self):
         dataset = MRIDataset()
+        train_dataset, test_dataset = random_split(dataset, [0.9, 0.1])
+
         model = Model(n_class = 5)
 
         want_train = input("Do you want to train (y/n)")
 
         if want_train == 'y': 
-            model = Trainer(model, train_dataset).train()
+            Trainer(model, train_dataset).train()
             predictor = Predictor(model, test_dataset)
             return
 
@@ -42,12 +44,14 @@ class Main:
 
     def __ct(self):
         dataset = CTDataset()
+        train_dataset, test_dataset = random_split(dataset, [0.9, 0.1])
+
         model = Model(n_class = 2)
 
         want_train = input("Do you want to train (y/n)")
 
         if want_train == 'y': 
-            model = Trainer(model, train_dataset).train()
+            Trainer(model, train_dataset).train()
             predictor = Predictor(model, test_dataset)
             return
 
@@ -62,4 +66,5 @@ class Main:
 
 
 if __name__ == '__main__':
+    torch.manual_seed_all(42)
     Main().run()
