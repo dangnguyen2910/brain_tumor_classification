@@ -24,9 +24,9 @@ class CTDataset(Dataset):
         tumor_folder_path = os.path.join(self.__datapath, "Tumor")
 
         image_path_list, label_list = self.__create_image_label_path_list(image_path_list, label_list, 
-                                                                         healthy_folder_path, 0)
+                                                                         healthy_folder_path, torch.tensor(0))
         image_path_list, label_list = self.__create_image_label_path_list(image_path_list, label_list, 
-                                                                         tumor_folder_path, 1)
+                                                                         tumor_folder_path, torch.tensor(1))
         return image_path_list, label_list
 
 
