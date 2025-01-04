@@ -1,4 +1,5 @@
 from dataset.ct_dataset import CTDataset
+from predictor import Predictor
 from torch.utils.data import random_split
 from torchvision.transforms import v2
 from model import Model
@@ -60,7 +61,9 @@ class Main:
 
         if want_train == 'y': 
             Trainer(model, train_dataset).train()
-            # predictor = Predictor(model, test_dataset)
+            predictor = Predictor(model)
+            precision, recall, f1 = predictor.eval(test_dataset)
+            print(f"Precision: {precision}\nRecall: {recall}\nF1: {f1}")
             return
 
         model_name_list = os.listdir(self.pretrained_model_path)
@@ -70,7 +73,9 @@ class Main:
         choosed_model = int(input("Choose model: "))
         choosed_model = os.path.join(self.pretrained_model_path, model_name_list[choosed_model])
         model.load_state_dict(torch.load(choosed_model, weights_only = True))
-        predictor = Predictor(model, test_dataset)
+        predictor = Predictor(model)
+        precision, recall, f1 = predictor.eval(test_dataset)
+        print(f"Precision: {precision:.3f}\nRecall: {recall:.3f}\nF1: {f1:.3f}")
         return 
 
 
