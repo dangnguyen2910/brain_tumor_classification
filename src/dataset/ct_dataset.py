@@ -1,18 +1,26 @@
 from torch.utils.data import Dataset
 import torch
 from torchvision.io import read_image
+from torchvision.transforms import v2
 import os
+import cv2
 
 class CTDataset(Dataset): 
-    def __init__(self): 
-        self.__datapath = '../../data/Brain Tumor CT scan Images/'
+    def __init__(self, transform = None): 
+        self.__datapath = '../data/Brain Tumor CT scan Images/'
         self.__dataset = self.__make_imagepath_label_list()
         self.__device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.__transform = transform
 
 
     def __getitem__(self, index): 
-        img = read_image(self.__dataset[0][index])
+        img = cv2.imread(self.__dataset[0][index])
+        # img = read_image(self.__dataset[0][index])
+        img = torch.tensor(img).permute(2,0,1)
         label = self.__dataset[1][index]
+        if self.__transform: 
+            img = self.__transform(img).float()
+
         return img, label
 
 
@@ -42,6 +50,8 @@ class CTDataset(Dataset):
         return len(self.__dataset[0]) 
     
 
-if __name__ == "__main__":
-    dataset = CTDataset()
-    print(dataset[0][1])
+# if __name__ == "__main__":
+#     dataset = CTDataset()
+#     for i in range(len(dataset)):
+#         if (dataset[i][0].size(0) == 1):
+#             print(dataset[i][0].size())
