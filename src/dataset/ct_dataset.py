@@ -16,7 +16,7 @@ class CTDataset(Dataset):
     def __getitem__(self, index): 
         img = cv2.imread(self.__dataset[0][index])
         # img = read_image(self.__dataset[0][index])
-        img = torch.tensor(img).permute(2,0,1)
+        img = torch.tensor(img).permute(2,0,1).float()
         label = self.__dataset[1][index]
         if self.__transform: 
             img = self.__transform(img).float()
