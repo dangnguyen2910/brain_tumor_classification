@@ -22,7 +22,7 @@ class Trainer:
 
         for epoch in range(self.__epochs):
             print('-' * 50)
-            print(f'[{epoch}/{self.__epochs}]')
+            print(f'Epoch [{epoch}/{self.__epochs}]: ')
 
             start = torch.cuda.Event(enable_timing = True)
             end = torch.cuda.Event(enable_timing = True)
@@ -60,6 +60,8 @@ class Trainer:
             self.__optimizer.step()
 
             train_running_loss += loss.item()
+            if i % 100 == 99: 
+                print(f'  [{i}/{len(self.__train_dataloader)}]')
 
         return train_running_loss/len(self.__train_dataloader)
 
