@@ -63,16 +63,19 @@ class Main:
 
         want_train = input("Do you want to train (y/n): ")
 
-        if want_train == 'y': 
-            Trainer(model, train_dataset).train()
-            predictor = Predictor(model)
-            precision, recall, f1 = predictor.eval(test_dataset)
-            print(f"Precision: {precision}\nRecall: {recall}\nF1: {f1}")
-            return
-
+        print(f"Existing model(s): ")
         model_name_list = os.listdir(self.pretrained_model_path)
         for i, model_path in enumerate(model_name_list):
             print(f'{i}.{model_path}')
+
+        if want_train == 'y': 
+            train_losses, val_losses = Trainer(model, train_dataset).train()
+            predictor = Predictor(model)
+            self.__save_train_val_loss_fig(train_losses, val_losses)
+            precision, recall, f1 = predictor.eval(test_dataset)
+            print(f"Precision: {precision:.3f}\nRecall: {recall:.3f}\nF1: {f1:.3f}")
+            return
+
 
         choosed_model = int(input("Choose model: "))
         choosed_model = os.path.join(self.pretrained_model_path, model_name_list[choosed_model])
@@ -92,6 +95,22 @@ class Main:
         print(f"Precision: {precision:.3f}\nRecall: {recall:.3f}\nF1: {f1:.3f}")
         return 
 
+    
+    def __save_train_val_loss_fig(self, train_losses, val_losses):
+        if not os.path.exists("../figures"):
+            os.makedirs("../figures")
+
+        epochs_list = [x for x in range(1, len(train_losses) + 1)]
+
+        fig = plt.figure()
+        plt.plot(epochs_list, train_losses, label='Train')
+        plt.plot(epochs_list, val_losses, label='Validation')
+        plt.xlabel("Epochs")
+        plt.ylabel("Loss")
+        plt.title("Loss per epoch")
+        plt.grid()
+        plt.legend()
+        plt.savefig('../figures/train_val_loss')
 
 if __name__ == '__main__':
     torch.manual_seed(42)
