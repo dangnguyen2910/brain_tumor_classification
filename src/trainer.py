@@ -19,10 +19,12 @@ class Trainer:
     def train(self):
         model_name = input("Enter model name(data_model_version.pth): ")
         best_vloss = 100
+        train_losses = []
+        val_losses = []
 
         for epoch in range(self.__epochs):
             print('-' * 50)
-            print(f'Epoch [{epoch}/{self.__epochs}]: ')
+            print(f'Epoch [{epoch+1}/{self.__epochs}]: ')
 
             start = torch.cuda.Event(enable_timing = True)
             end = torch.cuda.Event(enable_timing = True)
@@ -35,13 +37,18 @@ class Trainer:
             end.record()
             torch.cuda.synchronize()
 
-            print(f'\tTrain loss      : {train_loss:.3f}')
-            print(f'\tValidation loss : {val_loss:.3f}')
-            print(f'\tTrain time/epoch: {start.elapsed_time(end)}')
+            print(f'  Train loss      : {train_loss:.3f}')
+            print(f'  Validation loss : {val_loss:.3f}')
+            print(f'  Train time/epoch: {start.elapsed_time(end) / 1000:.3f}')
+
+            train_losses.append(train_loss)
+            val_losses.append(val_loss)
 
             if val_loss < best_vloss: 
                 best_vloss = val_loss
                 torch.save(self.__model.state_dict(), os.path.join('../pretrained_model/', model_name))
+
+            return train_losses, val_losses
 
 
     
@@ -61,7 +68,7 @@ class Trainer:
 
             train_running_loss += loss.item()
             if i % 100 == 99: 
-                print(f'  [{i}/{len(self.__train_dataloader)}]')
+                print(f'  [{i+1}/{len(self.__train_dataloader)}]')
 
         return train_running_loss/len(self.__train_dataloader)
 
