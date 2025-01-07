@@ -5,13 +5,13 @@ import os
 class Trainer: 
     def __init__(self, model, dataset): 
         self.__device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        self.__model = model.to(self.__device)
+        self.__model = model.cuda()
         self.__train_dataset, self.__val_dataset = random_split(dataset, [0.9, 0.1])
         self.__train_dataloader = DataLoader(self.__train_dataset, batch_size=4, shuffle=True)
         self.__val_dataloader = DataLoader(self.__val_dataset, batch_size=4, shuffle=True)
         self.__loss_fn = torch.nn.CrossEntropyLoss()
         self.__optimizer = torch.optim.Adam(self.__model.parameters(), lr=0.0001)
-        self.__epochs = 1
+        self.__epochs = 70
         self.train_loss_list = []
         self.val_loss_list = []
 
@@ -48,7 +48,7 @@ class Trainer:
                 best_vloss = val_loss
                 torch.save(self.__model.state_dict(), os.path.join('../pretrained_model/', model_name))
 
-            return train_losses, val_losses
+        return train_losses, val_losses
 
 
     
@@ -57,8 +57,8 @@ class Trainer:
         train_running_loss = 1000
 
         for i, data in enumerate(self.__train_dataloader):
-            input = data[0].to(self.__device)
-            label = data[1].to(self.__device)
+            input = data[0].cuda()
+            label = data[1].cuda()
 
             self.__optimizer.zero_grad()
             output = self.__model(input)
@@ -78,8 +78,8 @@ class Trainer:
         val_running_loss = 0 
 
         for i, data in enumerate(self.__val_dataloader):
-            input = data[0].to(self.__device)
-            label = data[1].to(self.__device)
+            input = data[0].cuda()
+            label = data[1].cuda()
 
             output = self.__model(input)
             loss = self.__loss_fn(output, label)
